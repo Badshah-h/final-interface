@@ -193,3 +193,35 @@
     opacity: 0.8;
   }
 }
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.perspective-800 {
+  perspective: 800px;
+}
+
+.rotate-y-1 {
+  transform: rotateY(1deg);
+}
+
+.rotate-x-1 {
+  transform: rotateX(1deg);
+}
+
+.hover\:rotate-y-0:hover {
+  transform: rotateY(0deg);
+}
+
+.hover\:rotate-x-0:hover {
+  transform: rotateX(0deg);
+}

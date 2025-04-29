@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import ChatWidget from "./chat/ChatWidget";
 import AdminLayout from "./admin/AdminLayout";
@@ -15,7 +15,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ExternalLink, MessageSquare, Settings } from "lucide-react";
+import {
+  ExternalLink,
+  MessageSquare,
+  Settings,
+  Home as HomeIcon,
+} from "lucide-react";
 
 function Home() {
   const [activeView, setActiveView] = useState("dashboard");
@@ -86,7 +91,17 @@ function Home() {
       </AdminLayout>
 
       {/* Preview Button - Fixed position */}
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className="fixed bottom-6 right-6 z-40 flex gap-2">
+        <Link to="/">
+          <Button
+            size="lg"
+            variant="outline"
+            className="shadow-lg flex items-center gap-2"
+          >
+            <HomeIcon className="h-5 w-5" />
+            Back to Home
+          </Button>
+        </Link>
         <Button
           size="lg"
           className="shadow-lg flex items-center gap-2 animate-pulse-subtle"
