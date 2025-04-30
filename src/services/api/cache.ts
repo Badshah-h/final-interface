@@ -9,7 +9,7 @@ interface CacheEntry<T> {
   expiry: number;
 }
 
-class ApiCache {
+export class ApiCache {
   private cache: Map<string, CacheEntry<any>> = new Map();
 
   /**

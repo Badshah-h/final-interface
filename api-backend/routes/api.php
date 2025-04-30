@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ActivityLogController;
-
+use App\Http\Controllers\CsrfCookieController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,6 +18,9 @@ use App\Http\Controllers\Api\ActivityLogController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+// CSRF Cookie Route
+Route::get('/sanctum/csrf-cookie', [CsrfCookieController::class, 'show']);
 
 // Authentication Routes
 Route::post('/login', [AuthController::class, 'login']);

@@ -12,7 +12,7 @@ import {
   CSRF_ENABLED,
   CSRF_HEADER_NAME,
 } from "./config";
-import { apiCache } from "./cache";
+import { apiCache, ApiCache } from "./cache";
 import { getApiUrl, getEndpointDefinition } from "./registry";
 
 export class ApiError extends Error {
@@ -97,7 +97,7 @@ export class BaseApiService {
     useCache: boolean = true,
   ): Promise<T> {
     const url = this.buildUrl(endpoint, params);
-    const cacheKey = apiCache.constructor.generateKey(url, {});
+    const cacheKey = ApiCache.generateKey(url, {});
 
     // Check cache if enabled and method is cacheable
     if (ENABLE_CACHING && useCache) {
@@ -188,7 +188,7 @@ export class BaseApiService {
   ): Promise<T> {
     const endpointDef = getEndpointDefinition(category, endpoint);
     const url = getApiUrl(category, endpoint, pathParams);
-    const cacheKey = apiCache.constructor.generateKey(url, queryParams);
+    const cacheKey = ApiCache.generateKey(url, queryParams);
 
     // Check cache if enabled and method is GET and endpoint is cacheable
     if (
