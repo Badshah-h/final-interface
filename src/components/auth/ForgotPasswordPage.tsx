@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { authService } from "@/services/auth";
+import { ApiError } from "@/services/api/base";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,12 +20,18 @@ const ForgotPasswordPage = () => {
     setIsLoading(true);
     setError("");
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await authService.forgotPassword({ email });
       setIsSubmitted(true);
-      // In a real app, you would handle password reset request here
-    }, 1500);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message || "Failed to send reset link");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

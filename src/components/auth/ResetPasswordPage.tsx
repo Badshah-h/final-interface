@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { authService } from "@/services/auth";
+import { ApiError } from "@/services/api/base";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,13 +12,32 @@ import { ArrowRight, ArrowLeft, CheckCircle, Lock } from "lucide-react";
 
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
+    email: "",
     password: "",
     confirmPassword: "",
+    token: "",
   });
+
+  useEffect(() => {
+    // Get token and email from URL parameters
+    const token = searchParams.get("token");
+    const email = searchParams.get("email");
+
+    if (token && email) {
+      setFormData((prev) => ({
+        ...prev,
+        token,
+        email: decodeURIComponent(email),
+      }));
+    } else {
+      setError("Invalid password reset link. Please request a new one.");
+    }
+  }, [searchParams]);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,12 +85,23 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await authService.resetPassword({
+        email: formData.email,
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+        token: formData.token,
+      });
       setIsSubmitted(true);
-      // In a real app, you would handle password reset here
-    }, 1500);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message || "Failed to reset password");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleContinue = () => {
