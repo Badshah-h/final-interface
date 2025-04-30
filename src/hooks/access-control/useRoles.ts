@@ -67,9 +67,11 @@ export function useRoles() {
   const fetchRoleData = useCallback(async () => {
     try {
       const response = await fetchRoles(queryParams);
-      setRoles(response.data);
-      setTotalRoles(response.meta.total);
-      setCurrentPage(response.meta.current_page);
+      if (response && response.data) {
+        setRoles(response.data);
+        setTotalRoles(response.meta?.total || 0);
+        setCurrentPage(response.meta?.current_page || 1);
+      }
     } catch (error) {
       console.error("Error fetching roles:", error);
     }

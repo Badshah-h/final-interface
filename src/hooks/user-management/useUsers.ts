@@ -63,9 +63,11 @@ export function useUsers() {
   const fetchUserData = useCallback(async () => {
     try {
       const response = await fetchUsers(queryParams);
-      setUsers(response.data);
-      setTotalUsers(response.meta.total);
-      setCurrentPage(response.meta.current_page);
+      if (response && response.data) {
+        setUsers(response.data);
+        setTotalUsers(response.meta?.total || 0);
+        setCurrentPage(response.meta?.current_page || 1);
+      }
     } catch (error) {
       console.error("Error fetching users:", error);
     }

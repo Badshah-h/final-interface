@@ -43,7 +43,9 @@ export function usePermissions() {
   const fetchPermissionData = useCallback(async () => {
     try {
       const response = await fetchPermissions();
-      setPermissionCategories(response.data);
+      if (response && response.data) {
+        setPermissionCategories(response.data);
+      }
     } catch (error) {
       console.error("Error fetching permissions:", error);
     }
