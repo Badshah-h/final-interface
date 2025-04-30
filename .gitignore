@@ -33,3 +33,4 @@ core
 .github/
 
 .history/.env.local
+.history/
