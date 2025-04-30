@@ -77,10 +77,14 @@ const LandingPage = () => {
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
             <div className="hidden sm:flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                Log In
-              </Button>
-              <Button size="sm">Sign Up</Button>
+              <Link to="/login">
+                <Button variant="outline" size="sm">
+                  Log In
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm">Sign Up</Button>
+              </Link>
             </div>
             <Button variant="ghost" size="icon" className="md:hidden">
               <svg
@@ -124,9 +128,11 @@ const LandingPage = () => {
                 single line of code.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="gap-2">
-                  Get Started <ArrowRight className="h-4 w-4" />
-                </Button>
+                <Link to="/register">
+                  <Button size="lg" className="gap-2">
+                    Get Started <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
                 <Link to="/dashboard">
                   <Button size="lg" variant="outline" className="gap-2">
                     Go to Dashboard <Layout className="h-4 w-4" />
@@ -411,9 +417,11 @@ const LandingPage = () => {
               exceptional AI-powered support.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="gap-2">
-                Start Free Trial <Zap className="h-4 w-4" />
-              </Button>
+              <Link to="/register">
+                <Button size="lg" className="gap-2">
+                  Start Free Trial <Zap className="h-4 w-4" />
+                </Button>
+              </Link>
               <Link to="/dashboard">
                 <Button size="lg" variant="outline" className="gap-2">
                   Go to Dashboard <Layout className="h-4 w-4" />
