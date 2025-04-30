@@ -15,6 +15,9 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +51,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Users,
   UserPlus,
   Shield,
@@ -64,6 +77,16 @@ import {
   Clock,
   Filter,
   Plus,
+  Save,
+  AlertCircle,
+  X,
+  Check,
+  User,
+  ShieldCheck,
+  ShieldAlert,
+  ShieldQuestion,
+  Settings,
+  FileText,
 } from "lucide-react";
 
 const UserManagement = () => {
@@ -71,10 +94,42 @@ const UserManagement = () => {
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [showEditUserDialog, setShowEditUserDialog] = useState(false);
+  const [showCreateRoleDialog, setShowCreateRoleDialog] = useState(false);
+  const [showEditRoleDialog, setShowEditRoleDialog] = useState(false);
+  const [showDeleteRoleDialog, setShowDeleteRoleDialog] = useState(false);
+  const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedRoleToEdit, setSelectedRoleToEdit] = useState(null);
+  const [selectedRoleToDelete, setSelectedRoleToDelete] = useState(null);
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
     role: "user",
+  });
+
+  const [newRole, setNewRole] = useState({
+    name: "",
+    description: "",
+    permissions: [],
+  });
+
+  const [editedUser, setEditedUser] = useState({
+    id: "",
+    name: "",
+    email: "",
+    role: "",
+    status: "",
+  });
+
+  const [editedRole, setEditedRole] = useState({
+    id: "",
+    name: "",
+    description: "",
+    permissions: [],
   });
 
   const users = [
@@ -125,11 +180,223 @@ const UserManagement = () => {
     },
   ];
 
+  // Available permissions grouped by category
+  const availablePermissions = [
+    {
+      category: "User Management",
+      permissions: [
+        { id: "create_users", name: "Create Users" },
+        { id: "edit_users", name: "Edit Users" },
+        { id: "delete_users", name: "Delete Users" },
+        { id: "assign_roles", name: "Assign Roles" },
+      ],
+    },
+    {
+      category: "AI Configuration",
+      permissions: [
+        { id: "manage_models", name: "Manage AI Models" },
+        { id: "edit_prompts", name: "Edit Prompts" },
+        { id: "test_ai", name: "Test AI Responses" },
+        { id: "view_ai_logs", name: "View AI Logs" },
+      ],
+    },
+    {
+      category: "Widget Builder",
+      permissions: [
+        { id: "create_widgets", name: "Create Widgets" },
+        { id: "edit_widgets", name: "Edit Widgets" },
+        { id: "publish_widgets", name: "Publish Widgets" },
+        { id: "delete_widgets", name: "Delete Widgets" },
+      ],
+    },
+    {
+      category: "Knowledge Base",
+      permissions: [
+        { id: "create_kb_articles", name: "Create Articles" },
+        { id: "edit_kb_articles", name: "Edit Articles" },
+        { id: "delete_kb_articles", name: "Delete Articles" },
+        { id: "manage_kb_categories", name: "Manage Categories" },
+      ],
+    },
+    {
+      category: "System Settings",
+      permissions: [
+        { id: "manage_api_keys", name: "Manage API Keys" },
+        { id: "billing_subscription", name: "Billing & Subscription" },
+        { id: "system_backup", name: "System Backup" },
+        { id: "view_audit_logs", name: "View Audit Logs" },
+      ],
+    },
+  ];
+
+  // Role definitions
+  const roles = [
+    {
+      id: "super-admin",
+      name: "Super Admin",
+      description: "Full access to all system features and settings",
+      userCount: 3,
+      permissions: availablePermissions.flatMap((category) =>
+        category.permissions.map((perm) => perm.id),
+      ),
+    },
+    {
+      id: "business-admin",
+      name: "Business Admin",
+      description: "Manage business-specific settings and content",
+      userCount: 5,
+      permissions: [
+        "create_users",
+        "edit_users",
+        "manage_models",
+        "edit_prompts",
+        "test_ai",
+        "view_ai_logs",
+        "create_widgets",
+        "edit_widgets",
+        "publish_widgets",
+        "create_kb_articles",
+        "edit_kb_articles",
+        "delete_kb_articles",
+        "manage_kb_categories",
+        "view_audit_logs",
+      ],
+    },
+    {
+      id: "moderator",
+      name: "Moderator",
+      description: "Monitor conversations and manage content",
+      userCount: 8,
+      permissions: [
+        "create_kb_articles",
+        "edit_kb_articles",
+        "manage_kb_categories",
+        "test_ai",
+        "view_ai_logs",
+      ],
+    },
+  ];
+
   const handleAddUser = () => {
-    // In a real implementation, this would add the user to the database
-    setShowAddUserDialog(false);
-    // Reset form
-    setNewUser({ name: "", email: "", role: "user" });
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      // In a real implementation, this would add the user to the database
+      setShowAddUserDialog(false);
+      setIsSubmitting(false);
+      // Reset form
+      setNewUser({ name: "", email: "", role: "user" });
+    }, 1000);
+  };
+
+  const handleEditUser = () => {
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      // In a real implementation, this would update the user in the database
+      setShowEditUserDialog(false);
+      setIsSubmitting(false);
+      setSelectedUser(null);
+    }, 1000);
+  };
+
+  const handleCreateRole = () => {
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      // In a real implementation, this would create a new role in the database
+      setShowCreateRoleDialog(false);
+      setIsSubmitting(false);
+      // Reset form
+      setNewRole({ name: "", description: "", permissions: [] });
+    }, 1000);
+  };
+
+  const handleEditRole = () => {
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      // In a real implementation, this would update the role in the database
+      setShowEditRoleDialog(false);
+      setIsSubmitting(false);
+      setSelectedRoleToEdit(null);
+    }, 1000);
+  };
+
+  const handleDeleteRole = () => {
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      // In a real implementation, this would delete the role from the database
+      setShowDeleteRoleDialog(false);
+      setIsSubmitting(false);
+      setSelectedRoleToDelete(null);
+    }, 1000);
+  };
+
+  const handleDeleteUser = () => {
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      // In a real implementation, this would delete the user from the database
+      setShowDeleteUserDialog(false);
+      setIsSubmitting(false);
+      setSelectedUserToDelete(null);
+    }, 1000);
+  };
+
+  const openEditUserDialog = (user) => {
+    setEditedUser({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+    });
+    setSelectedUser(user);
+    setShowEditUserDialog(true);
+  };
+
+  const openEditRoleDialog = (role) => {
+    setEditedRole({
+      id: role.id,
+      name: role.name,
+      description: role.description,
+      permissions: [...role.permissions],
+    });
+    setSelectedRoleToEdit(role);
+    setShowEditRoleDialog(true);
+  };
+
+  const openDeleteRoleDialog = (role) => {
+    setSelectedRoleToDelete(role);
+    setShowDeleteRoleDialog(true);
+  };
+
+  const openDeleteUserDialog = (user) => {
+    setSelectedUserToDelete(user);
+    setShowDeleteUserDialog(true);
+  };
+
+  const handlePermissionChange = (
+    permissionId,
+    isChecked,
+    setStateFunction,
+    currentState,
+  ) => {
+    if (isChecked) {
+      setStateFunction({
+        ...currentState,
+        permissions: [...currentState.permissions, permissionId],
+      });
+    } else {
+      setStateFunction({
+        ...currentState,
+        permissions: currentState.permissions.filter(
+          (id) => id !== permissionId,
+        ),
+      });
+    }
   };
 
   const filteredUsers = users.filter(
@@ -391,11 +658,15 @@ const UserManagement = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => openEditUserDialog(user)}
+                              >
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit User
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => openEditUserDialog(user)}
+                              >
                                 <Key className="mr-2 h-4 w-4" />
                                 Change Role
                               </DropdownMenuItem>
@@ -404,7 +675,10 @@ const UserManagement = () => {
                                 Send Email
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-destructive">
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => openDeleteUserDialog(user)}
+                              >
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Delete User
                               </DropdownMenuItem>
@@ -478,10 +752,21 @@ const UserManagement = () => {
                         </div>
                       </div>
                     </CardContent>
-                    <CardFooter className="border-t pt-4">
-                      <Button variant="outline" className="w-full">
+                    <CardFooter className="border-t pt-4 flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => openEditRoleDialog(roles[0])}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Role
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-none"
+                        onClick={() => openDeleteRoleDialog(roles[0])}
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </CardFooter>
                   </Card>
@@ -520,10 +805,21 @@ const UserManagement = () => {
                         </div>
                       </div>
                     </CardContent>
-                    <CardFooter className="border-t pt-4">
-                      <Button variant="outline" className="w-full">
+                    <CardFooter className="border-t pt-4 flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => openEditRoleDialog(roles[1])}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Role
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-none"
+                        onClick={() => openDeleteRoleDialog(roles[1])}
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </CardFooter>
                   </Card>
@@ -562,17 +858,28 @@ const UserManagement = () => {
                         </div>
                       </div>
                     </CardContent>
-                    <CardFooter className="border-t pt-4">
-                      <Button variant="outline" className="w-full">
+                    <CardFooter className="border-t pt-4 flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => openEditRoleDialog(roles[2])}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Role
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-none"
+                        onClick={() => openDeleteRoleDialog(roles[2])}
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </CardFooter>
                   </Card>
                 </div>
 
                 <div className="flex justify-center">
-                  <Button>
+                  <Button onClick={() => setShowCreateRoleDialog(true)}>
                     <Plus className="mr-2 h-4 w-4" />
                     Create New Role
                   </Button>
@@ -977,6 +1284,396 @@ const UserManagement = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit User Dialog */}
+      <Dialog open={showEditUserDialog} onOpenChange={setShowEditUserDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>
+              Update user information and role assignment.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Full Name</Label>
+              <Input
+                id="edit-name"
+                placeholder="John Doe"
+                value={editedUser.name}
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser, name: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-email">Email</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                placeholder="john@example.com"
+                value={editedUser.email}
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser, email: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-role">Role</Label>
+              <Select
+                value={editedUser.role}
+                onValueChange={(value) =>
+                  setEditedUser({ ...editedUser, role: value })
+                }
+              >
+                <SelectTrigger id="edit-role">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="moderator">Moderator</SelectItem>
+                  <SelectItem value="user">User</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-status">Status</Label>
+              <Select
+                value={editedUser.status}
+                onValueChange={(value) =>
+                  setEditedUser({ ...editedUser, status: value })
+                }
+              >
+                <SelectTrigger id="edit-status">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowEditUserDialog(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleEditUser} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <div className="h-4 w-4 mr-2 rounded-full border-2 border-t-transparent border-white animate-spin"></div>
+                  Saving...
+                </>
+              ) : (
+                <>Save Changes</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Role Dialog */}
+      <Dialog
+        open={showCreateRoleDialog}
+        onOpenChange={setShowCreateRoleDialog}
+      >
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Create New Role</DialogTitle>
+            <DialogDescription>
+              Define a new role and assign permissions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <div className="space-y-4 py-4 overflow-hidden flex flex-col h-full">
+              <div className="space-y-2">
+                <Label htmlFor="role-name">Role Name</Label>
+                <Input
+                  id="role-name"
+                  placeholder="e.g., Content Manager"
+                  value={newRole.name}
+                  onChange={(e) =>
+                    setNewRole({ ...newRole, name: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="role-description">Description</Label>
+                <Textarea
+                  id="role-description"
+                  placeholder="Describe the purpose and responsibilities of this role"
+                  value={newRole.description}
+                  onChange={(e) =>
+                    setNewRole({ ...newRole, description: e.target.value })
+                  }
+                  className="resize-none"
+                />
+              </div>
+              <div className="space-y-2 flex-1 overflow-hidden">
+                <Label>Permissions</Label>
+                <div className="border rounded-md overflow-hidden flex-1">
+                  <ScrollArea className="h-[300px] pr-4">
+                    <div className="p-4 space-y-6">
+                      {availablePermissions.map((category) => (
+                        <div key={category.category} className="space-y-2">
+                          <h4 className="font-medium text-sm">
+                            {category.category}
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {category.permissions.map((permission) => (
+                              <div
+                                key={permission.id}
+                                className="flex items-center space-x-2 border p-2 rounded-md"
+                              >
+                                <Checkbox
+                                  id={`perm-${permission.id}`}
+                                  checked={newRole.permissions.includes(
+                                    permission.id,
+                                  )}
+                                  onCheckedChange={(checked) =>
+                                    handlePermissionChange(
+                                      permission.id,
+                                      checked,
+                                      setNewRole,
+                                      newRole,
+                                    )
+                                  }
+                                />
+                                <Label
+                                  htmlFor={`perm-${permission.id}`}
+                                  className="flex-1 cursor-pointer"
+                                >
+                                  {permission.name}
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowCreateRoleDialog(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateRole}
+              disabled={isSubmitting || !newRole.name.trim()}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="h-4 w-4 mr-2 rounded-full border-2 border-t-transparent border-white animate-spin"></div>
+                  Creating...
+                </>
+              ) : (
+                <>Create Role</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Role Dialog */}
+      <Dialog open={showEditRoleDialog} onOpenChange={setShowEditRoleDialog}>
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Edit Role</DialogTitle>
+            <DialogDescription>
+              Modify role details and permissions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <div className="space-y-4 py-4 overflow-hidden flex flex-col h-full">
+              <div className="space-y-2">
+                <Label htmlFor="edit-role-name">Role Name</Label>
+                <Input
+                  id="edit-role-name"
+                  placeholder="e.g., Content Manager"
+                  value={editedRole.name}
+                  onChange={(e) =>
+                    setEditedRole({ ...editedRole, name: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-role-description">Description</Label>
+                <Textarea
+                  id="edit-role-description"
+                  placeholder="Describe the purpose and responsibilities of this role"
+                  value={editedRole.description}
+                  onChange={(e) =>
+                    setEditedRole({
+                      ...editedRole,
+                      description: e.target.value,
+                    })
+                  }
+                  className="resize-none"
+                />
+              </div>
+              <div className="space-y-2 flex-1 overflow-hidden">
+                <Label>Permissions</Label>
+                <div className="border rounded-md overflow-hidden flex-1">
+                  <ScrollArea className="h-[300px] pr-4">
+                    <div className="p-4 space-y-6">
+                      {availablePermissions.map((category) => (
+                        <div key={category.category} className="space-y-2">
+                          <h4 className="font-medium text-sm">
+                            {category.category}
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {category.permissions.map((permission) => (
+                              <div
+                                key={permission.id}
+                                className="flex items-center space-x-2 border p-2 rounded-md"
+                              >
+                                <Checkbox
+                                  id={`edit-perm-${permission.id}`}
+                                  checked={editedRole.permissions.includes(
+                                    permission.id,
+                                  )}
+                                  onCheckedChange={(checked) =>
+                                    handlePermissionChange(
+                                      permission.id,
+                                      checked,
+                                      setEditedRole,
+                                      editedRole,
+                                    )
+                                  }
+                                />
+                                <Label
+                                  htmlFor={`edit-perm-${permission.id}`}
+                                  className="flex-1 cursor-pointer"
+                                >
+                                  {permission.name}
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowEditRoleDialog(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleEditRole}
+              disabled={isSubmitting || !editedRole.name.trim()}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="h-4 w-4 mr-2 rounded-full border-2 border-t-transparent border-white animate-spin"></div>
+                  Saving...
+                </>
+              ) : (
+                <>Save Changes</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Role Confirmation */}
+      <AlertDialog
+        open={showDeleteRoleDialog}
+        onOpenChange={setShowDeleteRoleDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Role</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the role "
+              {selectedRoleToDelete?.name}"? This action cannot be undone.
+              {selectedRoleToDelete?.userCount > 0 && (
+                <div className="mt-2 flex items-center text-destructive">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  <span>
+                    This role is currently assigned to{" "}
+                    {selectedRoleToDelete?.userCount} users. They will need to
+                    be reassigned.
+                  </span>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteRole}
+              disabled={isSubmitting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="h-4 w-4 mr-2 rounded-full border-2 border-t-transparent border-current animate-spin"></div>
+                  Deleting...
+                </>
+              ) : (
+                <>Delete</>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete User Confirmation */}
+      <AlertDialog
+        open={showDeleteUserDialog}
+        onOpenChange={setShowDeleteUserDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the user "
+              {selectedUserToDelete?.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={isSubmitting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="h-4 w-4 mr-2 rounded-full border-2 border-t-transparent border-current animate-spin"></div>
+                  Deleting...
+                </>
+              ) : (
+                <>Delete</>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
