@@ -63,6 +63,7 @@ import {
   XCircle,
   Clock,
   Filter,
+  Plus,
 } from "lucide-react";
 
 const UserManagement = () => {

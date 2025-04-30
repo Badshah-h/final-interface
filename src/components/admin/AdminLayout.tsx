@@ -52,6 +52,7 @@ import {
 interface AdminLayoutProps {
   children: ReactNode;
   activePage?: string;
+  onNavigate?: (page: string) => void;
 }
 
 const AdminLayout = ({
@@ -257,7 +258,11 @@ const AdminLayout = ({
                     <Button
                       variant={item.active ? "secondary" : "ghost"}
                       className={`w-full justify-start mb-0.5 ${collapsed && !isMobile ? "px-2" : ""} ${item.active ? "bg-secondary font-medium" : ""} h-10`}
-                      onClick={() => onNavigate && onNavigate(item.label)}
+                      onClick={() => {
+                        if (typeof onNavigate === "function") {
+                          onNavigate(item.label);
+                        }
+                      }}
                     >
                       <span
                         className={`${item.active ? "text-primary" : "text-muted-foreground"} mr-3`}
