@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class ActivityLog extends Model
+class Permission extends Model
 {
     use HasFactory;
 
@@ -15,12 +17,10 @@ class ActivityLog extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
-        'action',
-        'target',
-        'details',
-        'ip_address',
-        'user_agent',
+        'name',
+        'guard_name',
+        'category',
+        'description',
         'is_active',
         'created_by',
         'updated_by',
@@ -32,30 +32,31 @@ class ActivityLog extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'details' => 'json',
         'is_active' => 'boolean',
     ];
 
     /**
-     * Get the user that performed the action.
+     * Get the roles that have this permission.
      */
-    public function user()
+    public function roles(): BelongsToMany
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(Role::class, 'permission_role')
+            ->withPivot('is_active', 'created_by', 'updated_by')
+            ->withTimestamps();
     }
-    
+
     /**
-     * Get the user who created this activity log.
+     * Get the user who created this permission.
      */
-    public function creator()
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    
+
     /**
-     * Get the user who last updated this activity log.
+     * Get the user who last updated this permission.
      */
-    public function updater()
+    public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
