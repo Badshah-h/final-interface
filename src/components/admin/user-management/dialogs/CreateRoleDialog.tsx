@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import { NewRole, PermissionCategory } from "../types";
+import { NewRole, PermissionCategory } from "../../../../types";
 import PermissionGroup from "../components/PermissionGroup";
 
 interface CreateRoleDialogProps {

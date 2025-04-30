@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
-import { Role, PermissionCategory } from "../types";
+import { Role, PermissionCategory } from "../../../../types";
 
 interface PermissionManagementProps {
   role: Role;

@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import AuthLayout from "./AuthLayout";
 import { ArrowRight, Github, Mail } from "lucide-react";
+import { authService } from "@/services/auth/authService";
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,12 +19,17 @@ const LoginPage = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // In a real app, you would handle authentication here
+    try {
+      await authService.login({
+        email,
+        password,
+        remember: rememberMe,
+      });
       window.location.href = "/dashboard";
-    }, 1500);
+    } catch (error) {
+      console.error("Login failed:", error);
+      setIsLoading(false);
+    }
   };
 
   return (

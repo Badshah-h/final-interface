@@ -17,7 +17,7 @@ import PermissionManagement from "./PermissionManagement";
 import { CreateRoleDialog } from "../dialogs/CreateRoleDialog";
 import { EditRoleDialog } from "../dialogs/EditRoleDialog";
 import { DeleteRoleDialog } from "../dialogs/DeleteRoleDialog";
-import { Role } from "../types";
+import { Role } from "../../../../types";
 
 const RolesPermissions = () => {
   const [showCreateRoleDialog, setShowCreateRoleDialog] = useState(false);

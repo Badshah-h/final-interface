@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Role } from "../types";
+import { Role } from "../../../../types";
 
 interface RoleCardProps {
   role: Role;

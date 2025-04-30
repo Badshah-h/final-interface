@@ -10,7 +10,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { User } from "../types";
+import { User } from "../../../../types";
 
 interface DeleteUserDialogProps {
   open: boolean;

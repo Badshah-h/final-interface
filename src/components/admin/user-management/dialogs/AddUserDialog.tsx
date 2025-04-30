@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { NewUser } from "../types";
+import { NewUser } from "../../../../types";
 
 interface AddUserDialogProps {
   children: ReactNode;

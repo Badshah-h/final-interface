@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { Role } from "../types";
+import { Role } from "../../../../types";
 
 interface DeleteRoleDialogProps {
   open: boolean;

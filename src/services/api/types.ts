@@ -1,5 +1,8 @@
 /**
- * API types for request/response data structures
+ * API Types
+ * 
+ * Contains types specific to API requests/responses and data transfer.
+ * Core domain types are in @/types
  */
 import {
   User,
@@ -7,16 +10,15 @@ import {
   Permission,
   PermissionCategory,
   ActivityLogEntry,
-} from "@/components/admin/user-management/types";
+} from "@/types";
 
-// Common response structure
+// Common API Response Types
 export interface ApiResponse<T> {
   data: T;
   message?: string;
   meta?: PaginationMeta;
 }
 
-// Pagination metadata
 export interface PaginationMeta {
   current_page: number;
   from: number;
@@ -27,71 +29,61 @@ export interface PaginationMeta {
   total: number;
 }
 
-// Paginated response
 export interface PaginatedResponse<T> {
   data: T[];
   meta: PaginationMeta;
 }
 
-// User API types
-export interface CreateUserRequest {
+// API Request Types
+export interface UserCreateRequest {
   name: string;
   email: string;
   role: string;
   send_email?: boolean;
 }
 
-export interface UpdateUserRequest {
+export interface UserUpdateRequest {
   name?: string;
   email?: string;
   role?: string;
   status?: string;
 }
 
-// Role API types
-export interface CreateRoleRequest {
+export interface RoleCreateRequest {
   name: string;
   description: string;
   permissions: string[];
 }
 
-export interface UpdateRoleRequest {
+export interface RoleUpdateRequest {
   name?: string;
   description?: string;
   permissions?: string[];
 }
 
-// Permission API types
-export interface UpdatePermissionsRequest {
+export interface PermissionUpdateRequest {
   permissions: string[];
 }
 
-// Query parameters
-export interface UserQueryParams {
+// Query Parameter Types
+export interface BaseQueryParams {
   page?: number;
   per_page?: number;
   search?: string;
+  sort_by?: string;
+  sort_direction?: "asc" | "desc";
+}
+
+export interface UserQueryParams extends BaseQueryParams {
   role?: string;
   status?: string;
-  sort_by?: string;
-  sort_direction?: "asc" | "desc";
 }
 
-export interface RoleQueryParams {
-  page?: number;
-  per_page?: number;
-  search?: string;
-  sort_by?: string;
-  sort_direction?: "asc" | "desc";
-}
+export interface RoleQueryParams extends BaseQueryParams {}
 
-export interface ActivityLogQueryParams {
-  page?: number;
-  per_page?: number;
+export interface ActivityLogQueryParams extends BaseQueryParams {
   user_id?: string;
   action_type?: string;
   date_from?: string;
   date_to?: string;
-  sort_by?: string;
-  sort_direction?: "asc" | "desc";
 }

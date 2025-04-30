@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import AuthLayout from "./AuthLayout";
 import { ArrowRight, Check, Github, Mail, User } from "lucide-react";
+import { authService } from "@/services/auth/authService";
 
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -64,12 +65,18 @@ const RegisterPage = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // In a real app, you would handle registration here
+    try {
+      await authService.register({
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+      });
       window.location.href = "/dashboard";
-    }, 1500);
+    } catch (error) {
+      console.error("Registration failed:", error);
+      setIsLoading(false);
+    }
   };
 
   return (

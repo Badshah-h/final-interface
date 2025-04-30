@@ -43,11 +43,11 @@ import {
 } from "@/components/ui/table";
 
 import { users } from "../data/mockData";
-import { getRoleBadgeVariant } from "../utils/helpers";
+import { getRoleBadgeVariant } from "../../../../utils/helpers";
 import StatusIcon from "../components/StatusIcon";
 import { EditUserDialog } from "../dialogs/EditUserDialog";
 import { DeleteUserDialog } from "../dialogs/DeleteUserDialog";
-import { User } from "../types";
+import { User } from "../../../../types";
 
 const UsersList = () => {
   const [searchQuery, setSearchQuery] = useState("");

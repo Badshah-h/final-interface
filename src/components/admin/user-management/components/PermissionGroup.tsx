@@ -1,4 +1,4 @@
-import { PermissionCategory } from "../types";
+import { PermissionCategory } from "../../../../types";
 import PermissionCheckbox from "./PermissionCheckbox";
 
 interface PermissionGroupProps {

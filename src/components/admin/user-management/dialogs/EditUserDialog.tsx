@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { User, EditedUser } from "../types";
+import { User, EditedUser } from "../../../../types";
 
 interface EditUserDialogProps {
   open: boolean;

@@ -15,7 +15,7 @@ import { permissionService } from "@/services/permissions/permissionService";
 import {
   Role,
   PermissionCategory,
-} from "@/components/admin/user-management/types";
+} from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 

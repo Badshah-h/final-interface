@@ -98,7 +98,7 @@ export class BaseApiService {
   /**
    * Build URL with query parameters
    */
-  private buildUrl(endpoint: string, params?: Record<string, any>): string {
+  protected buildUrl(endpoint: string, params?: Record<string, any>): string {
     const url = new URL(`${this.baseUrl}${endpoint}`);
 
     if (params) {
