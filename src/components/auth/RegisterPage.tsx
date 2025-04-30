@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,31 +7,83 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import AuthLayout from "./AuthLayout";
-import { ArrowRight, Check, Github, Mail, User } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Github,
+  Mail,
+  User,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { authService } from "@/services/auth/authService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+// Define the validation schema using zod
+const registerSchema = z
+  .object({
+    fullName: z
+      .string()
+      .min(2, { message: "Name must be at least 2 characters" }),
+    email: z.string().email({ message: "Please enter a valid email address" }),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" })
+      .regex(/[A-Z]/, {
+        message: "Password must contain at least one uppercase letter",
+      })
+      .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+    confirmPassword: z.string(),
+    agreeToTerms: z.boolean().refine((val) => val === true, {
+      message: "You must agree to the terms and conditions",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    agreeToTerms: false,
-  });
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  // Initialize react-hook-form with zod resolver
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+    trigger,
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      agreeToTerms: false,
+    },
+  });
 
-    // Calculate password strength when password field changes
-    if (name === "password") {
-      calculatePasswordStrength(value);
+  // Watch password field for strength calculation
+  const password = watch("password");
+
+  // Calculate password strength whenever password changes
+  React.useEffect(() => {
+    if (password) {
+      calculatePasswordStrength(password);
     }
-  };
+  }, [password]);
 
   const calculatePasswordStrength = (password: string) => {
     // Simple password strength calculation
@@ -57,24 +109,36 @@ const RegisterPage = () => {
     return "bg-green-500";
   };
 
-  const handleNextStep = () => {
-    setStep(2);
+  const handleNextStep = async () => {
+    // Validate only the fields in step 1
+    const isValid = await trigger(["fullName", "email"]);
+    if (isValid) {
+      setStep(2);
+    }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRegister = async (data: RegisterFormValues) => {
+    setApiError(null);
     setIsLoading(true);
 
     try {
       await authService.register({
-        name: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        password_confirmation: formData.confirmPassword,
+        name: data.fullName,
+        email: data.email,
+        password: data.password,
+        password_confirmation: data.confirmPassword,
       });
-      window.location.href = "/dashboard";
-    } catch (error) {
+      setRegisterSuccess(true);
+      // Redirect after a short delay to show success message
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1500);
+    } catch (error: any) {
       console.error("Registration failed:", error);
+      setApiError(
+        error.response?.data?.message ||
+          "Registration failed. Please try again.",
+      );
       setIsLoading(false);
     }
   };
@@ -107,6 +171,22 @@ const RegisterPage = () => {
           </div>
         </div>
 
+        {apiError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{apiError}</AlertDescription>
+          </Alert>
+        )}
+
+        {registerSuccess && (
+          <Alert className="mb-4 border-green-500 text-green-500">
+            <CheckCircle2 className="h-4 w-4" />
+            <AlertDescription>
+              Registration successful! Redirecting to dashboard...
+            </AlertDescription>
+          </Alert>
+        )}
+
         {step === 1 ? (
           <form
             onSubmit={(e) => {
@@ -119,26 +199,30 @@ const RegisterPage = () => {
               <Label htmlFor="fullName">Full Name</Label>
               <Input
                 id="fullName"
-                name="fullName"
+                {...register("fullName")}
                 placeholder="John Doe"
-                value={formData.fullName}
-                onChange={handleChange}
-                required
-                className="h-12"
+                className={`h-12 ${errors.fullName ? "border-red-500 focus-visible:ring-red-500" : ""}`}
               />
+              {errors.fullName && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.fullName.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
+                {...register("email")}
                 placeholder="name@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="h-12"
+                className={`h-12 ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
             <Button type="submit" className="w-full h-12 text-base font-medium">
               <div className="flex items-center gap-2">
@@ -148,20 +232,22 @@ const RegisterPage = () => {
             </Button>
           </form>
         ) : (
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
-                name="password"
                 type="password"
+                {...register("password")}
                 placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="h-12"
+                className={`h-12 ${errors.password ? "border-red-500 focus-visible:ring-red-500" : ""}`}
               />
-              {formData.password && (
+              {errors.password && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+              {password && (
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
                     <span>Password strength:</span>
@@ -190,28 +276,24 @@ const RegisterPage = () => {
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
                 id="confirmPassword"
-                name="confirmPassword"
                 type="password"
+                {...register("confirmPassword")}
                 placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                className="h-12"
+                className={`h-12 ${errors.confirmPassword ? "border-red-500 focus-visible:ring-red-500" : ""}`}
               />
-              {formData.password &&
-                formData.confirmPassword &&
-                formData.password !== formData.confirmPassword && (
-                  <p className="text-xs text-red-500">Passwords do not match</p>
-                )}
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="agreeToTerms"
-                checked={formData.agreeToTerms}
+                {...register("agreeToTerms")}
                 onCheckedChange={(checked) =>
-                  setFormData({ ...formData, agreeToTerms: !!checked })
+                  setValue("agreeToTerms", !!checked, { shouldValidate: true })
                 }
-                required
               />
               <Label
                 htmlFor="agreeToTerms"
@@ -235,6 +317,11 @@ const RegisterPage = () => {
                 </Link>
               </Label>
             </div>
+            {errors.agreeToTerms && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.agreeToTerms.message}
+              </p>
+            )}
             <div className="flex gap-3">
               <Button
                 type="button"
@@ -247,11 +334,7 @@ const RegisterPage = () => {
               <Button
                 type="submit"
                 className="flex-1 h-12 text-base font-medium"
-                disabled={
-                  isLoading ||
-                  !formData.agreeToTerms ||
-                  formData.password !== formData.confirmPassword
-                }
+                disabled={isLoading}
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">

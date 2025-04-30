@@ -6,28 +6,65 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import AuthLayout from "./AuthLayout";
-import { ArrowRight, Github, Mail } from "lucide-react";
+import {
+  ArrowRight,
+  Github,
+  Mail,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { authService } from "@/services/auth/authService";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// Define the validation schema using zod
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  remember: z.boolean().optional(),
+});
+
+// Infer the type from the schema
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Initialize react-hook-form with zod resolver
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      remember: false,
+    },
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
 
     try {
       await authService.login({
-        email,
-        password,
-        remember: rememberMe,
+        email: data.email,
+        password: data.password,
+        remember: data.remember,
       });
-      window.location.href = "/dashboard";
+      setFormSuccess("Login successful! Redirecting...");
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1500);
     } catch (error) {
       console.error("Login failed:", error);
+      setFormError("Invalid email or password. Please try again.");
       setIsLoading(false);
     }
   };
@@ -38,22 +75,53 @@ const LoginPage = () => {
       description="Enter your credentials to access your account"
     >
       <div className="space-y-6">
-        <form onSubmit={handleLogin} className="space-y-4">
+        {formError && (
+          <div className="bg-destructive/15 text-destructive p-3 rounded-md flex items-start gap-2 text-sm animate-fade-in">
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>{formError}</span>
+          </div>
+        )}
+
+        {formSuccess && (
+          <div className="bg-green-500/15 text-green-600 p-3 rounded-md flex items-start gap-2 text-sm animate-fade-in">
+            <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>{formSuccess}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label
+              htmlFor="email"
+              className={errors.email ? "text-destructive" : ""}
+            >
+              Email
+              {errors.email && (
+                <span className="ml-1 text-xs">({errors.email.message})</span>
+              )}
+            </Label>
             <Input
               id="email"
               type="email"
               placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="h-12"
+              className={`h-12 ${errors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              {...register("email")}
+              aria-invalid={errors.email ? "true" : "false"}
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label
+                htmlFor="password"
+                className={errors.password ? "text-destructive" : ""}
+              >
+                Password
+                {errors.password && (
+                  <span className="ml-1 text-xs">
+                    ({errors.password.message})
+                  </span>
+                )}
+              </Label>
               <Link
                 to="/forgot-password"
                 className="text-sm font-medium text-primary hover:underline"
@@ -65,18 +133,13 @@ const LoginPage = () => {
               id="password"
               type="password"
               placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="h-12"
+              className={`h-12 ${errors.password ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              {...register("password")}
+              aria-invalid={errors.password ? "true" : "false"}
             />
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox
-              id="remember"
-              checked={rememberMe}
-              onCheckedChange={(checked) => setRememberMe(!!checked)}
-            />
+            <Checkbox id="remember" {...register("remember")} />
             <Label
               htmlFor="remember"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
