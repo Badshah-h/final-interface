@@ -8,6 +8,7 @@ import WidgetBuilder from "./admin/WidgetBuilder";
 import KnowledgeBase from "./admin/KnowledgeBase";
 import UserManagement from "./admin/user-management";
 import ThemeBuilder from "./admin/ThemeBuilder";
+import ApiTester from "./api-tester/ApiTester";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -24,6 +25,7 @@ import {
   BarChart3,
   Webhook,
   Settings,
+  ServerCog,
 } from "lucide-react";
 
 function Home() {
@@ -73,6 +75,8 @@ function Home() {
         return <KnowledgeBase />;
       case "user-management":
         return <UserManagement />;
+      case "api-tester":
+        return <ApiTester />;
       case "analytics":
         return (
           <div className="space-y-6">
@@ -159,8 +163,8 @@ function Home() {
             </div>
           </div>
         );
-      case "theme-builder":
-        return <ThemeBuilder />;
+      case "api-tester":
+        return <ApiTester />;
       default:
         return <Dashboard />;
     }
@@ -188,8 +192,8 @@ function Home() {
         return "Integrations";
       case "settings":
         return "Settings";
-      case "theme-builder":
-        return "Theme Builder";
+      case "api-tester":
+        return "API Tester";
       default:
         return "Dashboard";
     }
@@ -197,55 +201,157 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <AdminLayout
-        activePage={getActivePageName()}
-        onNavigate={(page) => {
-          // Map the sidebar navigation items to our view states
-          const viewMap: Record<string, string> = {
-            Dashboard: "dashboard",
-            Conversations: "conversations",
-            "AI Configuration": "ai-config",
-            "Widget Builder": "widget-builder",
-            "Knowledge Base": "knowledge-base",
-            "User Management": "user-management",
-            Analytics: "analytics",
-            Embedding: "embedding",
-            Integrations: "integrations",
-            Settings: "settings",
-            "Theme Builder": "theme-builder",
-          };
-          if (viewMap[page]) {
-            handleViewChange(viewMap[page]);
-          }
-        }}
-      >
-        <div
-          className={`transition-opacity duration-300 ${isTransitioning ? "opacity-0" : "opacity-100"}`}
-        >
-          {renderContent()}
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="hidden md:flex flex-col w-64 bg-card border-r h-screen sticky top-0">
+          <div className="p-4 border-b">
+            <h2 className="text-2xl font-bold">AI Chat Admin</h2>
+          </div>
+          <div className="flex-1 overflow-auto py-2">
+            <div className="px-3 py-2">
+              <h3 className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">
+                General
+              </h3>
+              <div className="space-y-1 mt-2">
+                <Button
+                  variant={activeView === "dashboard" ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("dashboard")}
+                >
+                  <HomeIcon className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
+                <Button
+                  variant={
+                    activeView === "conversations" ? "secondary" : "ghost"
+                  }
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("conversations")}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Conversations
+                </Button>
+                <Button
+                  variant={activeView === "analytics" ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("analytics")}
+                >
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Analytics
+                </Button>
+              </div>
+            </div>
+            <div className="px-3 py-2">
+              <h3 className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">
+                Configuration
+              </h3>
+              <div className="space-y-1 mt-2">
+                <Button
+                  variant={activeView === "ai-config" ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("ai-config")}
+                >
+                  <ServerCog className="mr-2 h-4 w-4" />
+                  AI Configuration
+                </Button>
+                <Button
+                  variant={
+                    activeView === "widget-builder" ? "secondary" : "ghost"
+                  }
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("widget-builder")}
+                >
+                  <Code className="mr-2 h-4 w-4" />
+                  Widget Builder
+                </Button>
+                <Button
+                  variant={
+                    activeView === "knowledge-base" ? "secondary" : "ghost"
+                  }
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("knowledge-base")}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Knowledge Base
+                </Button>
+                <Button
+                  variant={activeView === "embedding" ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("embedding")}
+                >
+                  <Code className="mr-2 h-4 w-4" />
+                  Embedding
+                </Button>
+                <Button
+                  variant={
+                    activeView === "user-management" ? "secondary" : "ghost"
+                  }
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("user-management")}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  User Management
+                </Button>
+                <Button
+                  variant={
+                    activeView === "integrations" ? "secondary" : "ghost"
+                  }
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("integrations")}
+                >
+                  <Webhook className="mr-2 h-4 w-4" />
+                  Integrations
+                </Button>
+                <Button
+                  variant={activeView === "api-tester" ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("api-tester")}
+                >
+                  <Code className="mr-2 h-4 w-4" />
+                  API Tester
+                </Button>
+                <Button
+                  variant={activeView === "settings" ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => handleViewChange("settings")}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="p-4 border-t">
+            <div className="flex items-center">
+              <div className="ml-2 text-sm">
+                <p className="font-medium">Admin User</p>
+                <p className="text-xs text-muted-foreground">
+                  admin@example.com
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </AdminLayout>
 
-      {/* Preview Button - Fixed position */}
-      <div className="fixed bottom-6 right-6 z-40 flex gap-2">
-        <Link to="/">
-          <Button
-            size="lg"
-            variant="outline"
-            className="shadow-lg flex items-center gap-2"
+        {/* Main Content */}
+        <div className="flex-1">
+          {/* Mobile Header */}
+          <div className="md:hidden border-b sticky top-0 bg-background z-10">
+            <div className="flex items-center justify-between p-4">
+              <h2 className="text-xl font-bold">AI Chat Admin</h2>
+              <Button variant="outline" size="icon">
+                <MessageSquare className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div
+            className={`p-6 ${isTransitioning ? "opacity-0" : "opacity-100"} transition-opacity duration-300`}
           >
-            <HomeIcon className="h-5 w-5" />
-            Back to Home
-          </Button>
-        </Link>
-        <Button
-          size="lg"
-          className="shadow-lg flex items-center gap-2 animate-pulse-subtle"
-          onClick={() => window.open("/widget-preview", "_blank")}
-        >
-          <MessageSquare className="h-5 w-5" />
-          Preview Widget
-        </Button>
+            {renderContent()}
+          </div>
+        </div>
       </div>
     </div>
   );

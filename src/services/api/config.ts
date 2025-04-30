@@ -2,11 +2,27 @@
  * API configuration
  */
 
-// Base API URL - points to Laravel backend API
-export const API_BASE_URL = "http://localhost:8000/api";
+// Determine the environment and set the appropriate API URL
+const getApiBaseUrl = (): string => {
+  const env = import.meta.env.MODE || "development";
 
-// Flag to toggle between mock and real API
-export const USE_MOCK_API = false;
+  switch (env) {
+    case "production":
+      return import.meta.env.VITE_API_URL || "https://api.yourdomain.com/api";
+    case "staging":
+      return (
+        import.meta.env.VITE_API_URL || "https://staging-api.yourdomain.com/api"
+      );
+    case "test":
+      return import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+    case "development":
+    default:
+      return import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+  }
+};
+
+// Base API URL - points to Laravel backend API
+export const API_BASE_URL = getApiBaseUrl();
 
 // Default request headers
 export const DEFAULT_HEADERS = {
@@ -17,5 +33,14 @@ export const DEFAULT_HEADERS = {
 // Request timeout in milliseconds
 export const REQUEST_TIMEOUT = 10000;
 
-// Mock API delay to simulate network latency (in milliseconds)
-export const MOCK_API_DELAY = 500;
+// Enable/disable request caching
+export const ENABLE_CACHING = true;
+
+// Default cache time in milliseconds (5 minutes)
+export const DEFAULT_CACHE_TIME = 300000;
+
+// Maximum number of retries for failed requests
+export const MAX_RETRIES = 3;
+
+// Retry delay in milliseconds (exponential backoff will be applied)
+export const RETRY_DELAY = 1000;
