@@ -41,12 +41,52 @@ export interface User {
 }
 
 class AuthService extends BaseApiService {
+  constructor() {
+    super();
+    // Add a request interceptor to include the CSRF token in the headers
+    this.addRequestInterceptor((config) => {
+      const csrfToken = tokenService.getCsrfToken();
+      if (csrfToken) {
+        return {
+          ...config,
+          headers: {
+            ...config.headers,
+            "X-XSRF-TOKEN": csrfToken,
+          },
+        };
+      }
+      return config;
+    });
+  }
+
+  /**
+   * Initialize the auth service by fetching the CSRF token
+   */
+  async init(): Promise<void> {
+    try {
+      // Only initialize CSRF token if we're using Laravel Sanctum
+      const useSanctum = import.meta.env.VITE_USE_SANCTUM === "true";
+      if (useSanctum) {
+        await tokenService.initCsrfToken();
+      }
+    } catch (error) {
+      console.warn(
+        "CSRF initialization failed, continuing without CSRF protection:",
+        error,
+      );
+      // Continue without CSRF protection
+    }
+  }
+
   /**
    * Login with email and password
    */
   async login(
     credentials: LoginCredentials,
   ): Promise<ApiResponse<{ token: string; user: User }>> {
+    // Ensure CSRF token is initialized before login
+    await this.init();
+
     const response = await this.post<
       ApiResponse<{ token: string; user: User }>
     >("/login", credentials);
@@ -66,6 +106,9 @@ class AuthService extends BaseApiService {
   async register(
     data: RegisterData,
   ): Promise<ApiResponse<{ token: string; user: User }>> {
+    // Ensure CSRF token is initialized before registration
+    await this.init();
+
     const response = await this.post<
       ApiResponse<{ token: string; user: User }>
     >("/register", data);
@@ -109,6 +152,8 @@ class AuthService extends BaseApiService {
    * Send password reset link
    */
   async forgotPassword(data: ForgotPasswordData): Promise<ApiResponse<null>> {
+    // Ensure CSRF token is initialized before password reset
+    await this.init();
     return this.post<ApiResponse<null>>("/password/email", data);
   }
 
@@ -116,6 +161,8 @@ class AuthService extends BaseApiService {
    * Reset password with token
    */
   async resetPassword(data: ResetPasswordData): Promise<ApiResponse<null>> {
+    // Ensure CSRF token is initialized before password reset
+    await this.init();
     return this.post<ApiResponse<null>>("/password/reset", data);
   }
 
@@ -128,3 +175,8 @@ class AuthService extends BaseApiService {
 }
 
 export const authService = new AuthService();
+
+// Initialize the auth service
+authService.init().catch((error) => {
+  console.error("Failed to initialize auth service:", error);
+});

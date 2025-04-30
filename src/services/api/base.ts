@@ -9,6 +9,8 @@ import {
   DEFAULT_CACHE_TIME,
   MAX_RETRIES,
   RETRY_DELAY,
+  CSRF_ENABLED,
+  CSRF_HEADER_NAME,
 } from "./config";
 import { apiCache } from "./cache";
 import { getApiUrl, getEndpointDefinition } from "./registry";
@@ -292,6 +294,8 @@ export class BaseApiService {
     requestId: string = Math.random().toString(36).substring(2, 9),
     retryCount: number = 0,
   ): Promise<T> {
+    // Always include credentials in cross-origin requests
+    options.credentials = "include";
     try {
       // Apply request interceptors
       let modifiedOptions = { ...options };

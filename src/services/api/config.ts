@@ -5,19 +5,24 @@
 // Determine the environment and set the appropriate API URL
 const getApiBaseUrl = (): string => {
   const env = import.meta.env.MODE || "development";
+  const apiUrl = import.meta.env.VITE_API_URL;
 
+  // If API URL is explicitly set, use it
+  if (apiUrl) {
+    return apiUrl.endsWith("/api") ? apiUrl : `${apiUrl}/api`;
+  }
+
+  // Otherwise, use environment-specific defaults
   switch (env) {
     case "production":
-      return import.meta.env.VITE_API_URL || "https://api.yourdomain.com/api";
+      return "https://api.yourdomain.com/api";
     case "staging":
-      return (
-        import.meta.env.VITE_API_URL || "https://staging-api.yourdomain.com/api"
-      );
+      return "https://staging-api.yourdomain.com/api";
     case "test":
-      return import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+      return "http://localhost:8000/api";
     case "development":
     default:
-      return import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+      return "http://localhost:8000/api";
   }
 };
 
@@ -28,6 +33,8 @@ export const API_BASE_URL = getApiBaseUrl();
 export const DEFAULT_HEADERS = {
   "Content-Type": "application/json",
   Accept: "application/json",
+  // Include credentials in cross-origin requests
+  credentials: "include",
 };
 
 // Request timeout in milliseconds
@@ -44,3 +51,8 @@ export const MAX_RETRIES = 3;
 
 // Retry delay in milliseconds (exponential backoff will be applied)
 export const RETRY_DELAY = 1000;
+
+// CSRF token settings
+export const CSRF_ENABLED = import.meta.env.VITE_USE_SANCTUM === "true";
+export const CSRF_COOKIE_NAME = "XSRF-TOKEN";
+export const CSRF_HEADER_NAME = "X-XSRF-TOKEN";
