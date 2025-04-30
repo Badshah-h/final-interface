@@ -147,23 +147,30 @@ const LandingPage = () => {
             <div className="relative">
               <div className="relative rounded-lg border bg-background p-3 shadow-xl transform transition-all hover:scale-[1.01] hover:shadow-2xl">
                 <div className="rounded-md bg-muted p-4 h-[400px] relative overflow-hidden backdrop-blur-sm">
-                  <div className="absolute bottom-4 right-4 w-64 rounded-xl shadow-2xl overflow-hidden transform perspective-800 rotate-y-1 rotate-x-1 transition-all duration-300 hover:rotate-y-0 hover:rotate-x-0 border border-white/10 bg-white/5 backdrop-blur-sm">
-                    <div className="bg-gradient-to-r from-primary to-primary/80 p-3 flex justify-between items-center border-b border-white/10">
-                      <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-white/20 ring-2 ring-white/30 flex items-center justify-center shadow-inner">
-                          <Bot className="h-4 w-4 text-white" />
+                  {/* Chat widget that extends beyond the container */}
+                  <div className="absolute -bottom-20 -right-24 w-[420px] rounded-xl shadow-[0_20px_50px_rgba(249,115,22,0.4)] overflow-hidden transform perspective-[1200px] rotate-y-3 rotate-x-6 transition-all duration-700 hover:rotate-y-0 hover:rotate-x-0 hover:scale-105 border border-white/20 bg-white/5 backdrop-blur-sm animate-float z-30">
+                    {/* Video recording indicator */}
+                    <div className="absolute -top-3 -right-3 h-6 w-6 rounded-full bg-red-500 animate-pulse z-10 flex items-center justify-center">
+                      <div className="h-2 w-2 rounded-full bg-white"></div>
+                    </div>
+                    <div className="bg-gradient-to-r from-orange-500 to-orange-400 p-3 flex justify-between items-center border-b border-white/20 shadow-lg relative">
+                      {/* Glossy reflection effect */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-50"></div>
+                      <div className="flex items-center gap-2 relative z-10">
+                        <div className="h-8 w-8 rounded-full bg-white/20 ring-2 ring-white/40 flex items-center justify-center shadow-inner">
+                          <Bot className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-xs font-medium text-white">
+                          <h3 className="text-sm font-medium text-white">
                             AI Assistant
                           </h3>
-                          <p className="text-[10px] text-white/80 flex items-center gap-1">
+                          <p className="text-[10px] text-white/90 flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse"></span>
                             Online
                           </p>
                         </div>
                       </div>
-                      <button className="h-6 w-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors shadow-sm">
+                      <button className="h-7 w-7 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors shadow-sm relative z-10">
                         <span className="sr-only">Close</span>
                         <svg
                           width="12"
@@ -182,33 +189,48 @@ const LandingPage = () => {
                         </svg>
                       </button>
                     </div>
-                    <div className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 dark:bg-card p-3 h-32 overflow-y-auto">
-                      <div className="flex justify-start mb-2">
-                        <div className="max-w-[80%] rounded-lg bg-muted p-2 text-xs shadow-sm transform transition-all hover:-translate-y-0.5 hover:shadow-md">
+                    <div className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 dark:bg-card p-3 h-56 overflow-y-auto relative">
+                      {/* 3D effect overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/5 pointer-events-none"></div>
+                      {/* Scan line effect */}
+                      <div className="absolute inset-0 bg-scan-lines opacity-10 pointer-events-none"></div>
+                      <div className="flex justify-start mb-3">
+                        <div
+                          className="max-w-[80%] rounded-lg bg-muted p-3 text-xs shadow-md transform transition-all hover:-translate-y-1 hover:shadow-lg animate-slide-in-left"
+                          style={{ animationDelay: "0.3s" }}
+                        >
                           <p>Hello! How can I help you today?</p>
                         </div>
                       </div>
-                      <div className="flex justify-end mb-2">
-                        <div className="max-w-[80%] rounded-lg bg-gradient-to-r from-primary to-primary/90 p-2 text-xs text-white shadow-sm transform transition-all hover:-translate-y-0.5 hover:shadow-md">
+                      <div className="flex justify-end mb-3">
+                        <div
+                          className="max-w-[80%] rounded-lg bg-gradient-to-r from-orange-500 to-orange-400 p-3 text-xs text-white shadow-md transform transition-all hover:-translate-y-1 hover:shadow-lg animate-slide-in-right"
+                          style={{ animationDelay: "0.6s" }}
+                        >
                           <p>I have a question about your services.</p>
                         </div>
                       </div>
                       <div className="flex justify-start">
-                        <div className="max-w-[80%] rounded-lg bg-muted p-2 text-xs shadow-sm transform transition-all hover:-translate-y-0.5 hover:shadow-md">
+                        <div
+                          className="max-w-[80%] rounded-lg bg-muted p-3 text-xs shadow-md transform transition-all hover:-translate-y-1 hover:shadow-lg animate-slide-in-left"
+                          style={{ animationDelay: "0.9s" }}
+                        >
                           <p>
                             I'd be happy to help with that! What would you like
-                            to know?
+                            to know about our AI chat system?
                           </p>
                         </div>
                       </div>
                     </div>
-                    <div className="border-t p-2 flex gap-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+                    <div className="border-t p-3 flex gap-2 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm relative">
+                      {/* Bottom reflection */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent opacity-30"></div>
                       <input
                         type="text"
                         placeholder="Type your message..."
-                        className="flex-1 text-xs p-1.5 rounded-md border border-gray-200 dark:border-gray-700 shadow-inner focus:ring-2 focus:ring-primary/30 focus:outline-none transition-all"
+                        className="flex-1 text-xs p-2 rounded-md border border-gray-200 dark:border-gray-700 shadow-inner focus:ring-2 focus:ring-primary/30 focus:outline-none transition-all relative z-10"
                       />
-                      <button className="bg-gradient-to-r from-primary to-primary/90 text-white rounded-md px-3 py-1.5 text-xs shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                      <button className="bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-md px-4 py-2 text-xs shadow-md hover:shadow-lg hover:-translate-y-1 transition-all relative z-10">
                         Send
                       </button>
                     </div>
@@ -222,9 +244,28 @@ const LandingPage = () => {
                     </div>
                   </div>
                 </div>
+                {/* Enhanced background effects */}
+                <div className="absolute -z-10 h-48 w-48 rounded-full bg-orange-500/30 blur-3xl top-1/2 -translate-y-1/2 -right-20 animate-pulse-subtle"></div>
+                <div
+                  className="absolute -z-10 h-48 w-48 rounded-full bg-blue-500/30 blur-3xl bottom-0 left-1/2 -translate-x-1/2 animate-pulse-subtle"
+                  style={{ animationDelay: "1s" }}
+                ></div>
+                <div
+                  className="absolute -z-10 h-32 w-32 rounded-full bg-purple-500/20 blur-2xl top-1/4 right-1/4 animate-pulse-subtle"
+                  style={{ animationDelay: "1.5s" }}
+                ></div>
+                {/* Additional glow effect behind the chat widget */}
+                <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-orange-500/40 blur-3xl animate-pulse-subtle z-10"></div>
+                {/* Extra floating elements for depth */}
+                <div
+                  className="absolute top-20 right-20 h-16 w-16 rounded-full bg-blue-500/10 blur-md animate-float"
+                  style={{ animationDuration: "8s" }}
+                ></div>
+                <div
+                  className="absolute bottom-20 left-20 h-12 w-12 rounded-full bg-purple-500/10 blur-md animate-float"
+                  style={{ animationDuration: "6s", animationDelay: "1s" }}
+                ></div>
               </div>
-              <div className="absolute -z-10 h-32 w-32 rounded-full bg-primary/20 blur-3xl top-1/2 -translate-y-1/2 -right-16"></div>
-              <div className="absolute -z-10 h-32 w-32 rounded-full bg-blue-500/20 blur-3xl bottom-0 left-1/2 -translate-x-1/2"></div>
             </div>
           </div>
         </div>

@@ -225,3 +225,18 @@
 .hover\:rotate-x-0:hover {
   transform: rotateX(0deg);
 }
+
+/* Custom scan lines effect */
+.bg-scan-lines {
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px;
+}
+
+/* Glow effect for text */
+.shadow-glow {
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}

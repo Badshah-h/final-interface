@@ -6,6 +6,8 @@ import Dashboard from "./admin/Dashboard";
 import AIConfiguration from "./admin/AIConfiguration";
 import WidgetBuilder from "./admin/WidgetBuilder";
 import KnowledgeBase from "./admin/KnowledgeBase";
+import UserManagement from "./admin/UserManagement";
+import ThemeBuilder from "./admin/ThemeBuilder";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -44,6 +46,10 @@ function Home() {
         return <WidgetBuilder />;
       case "knowledge-base":
         return <KnowledgeBase />;
+      case "user-management":
+        return <UserManagement />;
+      case "theme-builder":
+        return <ThemeBuilder />;
       default:
         return <Dashboard />;
     }
@@ -59,6 +65,10 @@ function Home() {
         return "Widget Builder";
       case "knowledge-base":
         return "Knowledge Base";
+      case "user-management":
+        return "User Management";
+      case "theme-builder":
+        return "Theme Builder";
       default:
         return "Dashboard";
     }
