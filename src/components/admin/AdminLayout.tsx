@@ -58,6 +58,7 @@ interface AdminLayoutProps {
 const AdminLayout = ({
   children,
   activePage = "Dashboard",
+  onNavigate,
 }: AdminLayoutProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeTenant, setActiveTenant] = useState("Company Name");
